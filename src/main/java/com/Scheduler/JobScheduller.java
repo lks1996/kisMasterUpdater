@@ -18,7 +18,8 @@ public class JobScheduller {
     /**
      * cron = "[초] [분] [시] [일] [월] [요일]"
      */
-    @Scheduled(cron = "0 0 0 * * SAT,TUE")
+//    @Scheduled(cron = "0 0 0 * * SAT,TUE")
+    @Scheduled(cron = "0 5 09 * * *")
     public void scheduleWeeklyFilingUpdate() {
         log.warn("===== [START] Kis Master Updater =====");
         try {
