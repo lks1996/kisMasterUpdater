@@ -1,4 +1,4 @@
-name: Deploy Kis-Master-Updater on Windows Laptop with Docker
+name: Deploy kis-master-updater on Windows Laptop with Docker
 
 on:
   push:
@@ -16,21 +16,21 @@ jobs:
 
       # 2. Docker 이미지 빌드
       - name: 2. Build Docker Image
-        run: docker build -t Kis-Master-Updater .
+        run: docker build -t kis-master-updater .
 
       # 3. 기존 컨테이너 중지 및 제거
       - name: 3. Stop and Remove Existing Container
         continue-on-error: true
         shell: cmd
         run: |
-          docker stop Kis-Master-Updater-container
-          docker rm Kis-Master-Updater-container
+          docker stop kis-master-updater-container
+          docker rm kis-master-updater-container
 
       # 4. 새 Docker 컨테이너 실행 (볼륨 마운트 옵션 추가!)
       - name: 4. Run New Docker Container
         run: |
           docker run -d --restart always `
           -p 8190:8190 `
-          -v "C:\Kis-Master-Updater\config:/config" `
-          --name Kis-Master-Updater-container `
-          Kis-Master-Updater --spring.config.location=file:/config/application.yml
+          -v "C:\kis-master-updater\config:/config" `
+          --name kis-master-updater-container `
+          kis-master-updater --spring.config.location=file:/config/application.yml
