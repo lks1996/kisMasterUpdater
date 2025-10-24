@@ -57,15 +57,15 @@ public class KisMasterFileService {
     @Transactional
     public void processAllMasterFiles() {
         // 순서대로 나스닥, 뉴욕, 아멕스, 상해A, 상해B(지수), 심천A, 심천B(지수), 도쿄, 홍콩, 하노이, 호치민
-        List<String> exchangeCodes = Arrays.asList("nas", "nys", "ams", "shs", "shi", "szs", "szi", "tse", "hks", "hnx", "hsx");
-        log.warn("Starting processing all overseas master files for exchanges: {}", exchangeCodes);
+        List<String> exchangeIds = Arrays.asList("nas", "nys", "ams", "shs", "shi", "szs", "szi", "tse", "hks", "hnx", "hsx");
+        log.warn("Starting processing all overseas master files for exchanges: {}", exchangeIds);
 
-        for (String code : exchangeCodes) {
+        for (String id : exchangeIds) {
             try {
-                processSingleMasterFile(code);
+                processSingleMasterFile(id);
             } catch (Exception e) {
                 // 특정 파일 처리 실패 시 로깅하고 다음 파일로 진행.
-                log.error("Failed to process master file for exchange code: {}", code, e);
+                log.error("Failed to process master file for exchange id: {}", id, e);
             }
         }
         log.info("Finished processing all overseas master files.");
@@ -73,31 +73,30 @@ public class KisMasterFileService {
 
     /**
      * 특정 거래소의 마스터 파일을 다운로드하고 DB에 업데이트.
-     * @param exchangeCode 거래소 코드
+     * @param exchangeId 거래소 코드
      */
     @Transactional
-    public void processSingleMasterFile(String exchangeCode) throws IOException {
-        log.info("Processing master file for exchange: {}", exchangeCode);
+    public void processSingleMasterFile(String exchangeId) throws IOException {
+        log.info("Processing master file for exchange: {}", exchangeId);
 
         // 1. 파일 다운로드 및 압축 해제.
-        Path codFilePath = downloadAndUnzipMasterFile(exchangeCode);
+        Path codFilePath = downloadAndUnzipMasterFile(exchangeId);
 
         // 2. 파일 파싱.
-        List<OverseasStockInfo> stockInfos = parseMasterFile(codFilePath, exchangeCode);
+        List<OverseasStockInfo> stockInfos = parseMasterFile(codFilePath, exchangeId);
 
         // 3. DB 업데이트. (기존 데이터 삭제 후 새로 삽입)
         if (!stockInfos.isEmpty()) {
-            log.warn("Deleting existing data for exchange: {}", exchangeCode);
-            repository.deleteByExchangeId(exchangeCode.toUpperCase()); // 거래소 ID 기준으로 삭제 (대문자 통일)
-            log.warn("Saving {} new stock info entries for exchange: {}", stockInfos.size(), exchangeCode);
+            log.warn("Deleting existing data for exchange: {}", exchangeId);
+            repository.deleteByExchangeId(exchangeId.toUpperCase()); // 거래소 ID 기준으로 삭제 (대문자 통일)
             repository.saveAll(stockInfos);
-            log.warn("Successfully updated DB for exchange: {}", exchangeCode);
+            log.warn("Successfully updated {} for exchange id : {}", stockInfos.size(), exchangeId);
         } else {
-            log.warn("No stock info found after parsing for exchange: {}", exchangeCode);
+            log.warn("No stock info found after parsing for exchange: {}", exchangeId);
         }
 
         // 처리 완료 후 다운로드한 파일 삭제.
-         Files.deleteIfExists(codFilePath.getParent().resolve(exchangeCode + "mst.cod.zip"));
+         Files.deleteIfExists(codFilePath.getParent().resolve(exchangeId + "mst.cod.zip"));
          Files.deleteIfExists(codFilePath);
     }
 
