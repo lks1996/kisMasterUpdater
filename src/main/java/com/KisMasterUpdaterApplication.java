@@ -21,6 +21,5 @@ public class KisMasterUpdaterApplication implements CommandLineRunner  {
 	@Override
 	public void run(String... args) throws Exception {
 		kisMasterFileService.processAllMasterFiles();
-		System.exit(0);
 	}
 }
