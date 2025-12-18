@@ -31,6 +31,6 @@ jobs:
         run: |
           docker run -d --restart always `
           -p 8190:8190 `
-          -v "C:\kis-master-updater\config:/config" `
+          -v "C:\Projects\kis-master-updater\config:/config" `
           --name kis-master-updater-container `
           kis-master-updater --spring.config.location=file:/config/application.yml
