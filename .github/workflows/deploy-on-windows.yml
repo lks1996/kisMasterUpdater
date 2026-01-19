@@ -1,4 +1,4 @@
-name: Deploy kis-master-updater on Windows Laptop with Docker
+name: Build Docker Image for K8s CronJob
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
-    name: Build Docker Image and Deploy
+    name: Build Docker Image only
     runs-on: self-hosted
 
     steps:
@@ -16,21 +16,9 @@ jobs:
 
       # 2. Docker 이미지 빌드
       - name: 2. Build Docker Image
-        run: docker build -t kis-master-updater .
+        run: docker build -t kis-master-updater:latest .
 
-      # 3. 기존 컨테이너 중지 및 제거
-      - name: 3. Stop and Remove Existing Container
+      # 3. 디스크 공간 확보를 위한 정리
+      - name: 3. Prune Old Images
         continue-on-error: true
-        shell: cmd
-        run: |
-          docker stop kis-master-updater-container
-          docker rm kis-master-updater-container
-
-      # 4. 새 Docker 컨테이너 실행 (볼륨 마운트 옵션 추가!)
-      - name: 4. Run New Docker Container
-        run: |
-          docker run -d --restart always `
-          -p 8190:8190 `
-          -v "C:\Projects\kis-master-updater\config:/config" `
-          --name kis-master-updater-container `
-          kis-master-updater --spring.config.location=file:/config/application.yml
+        run: docker image prune -f
