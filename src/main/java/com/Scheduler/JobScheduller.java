@@ -17,6 +17,7 @@ public class JobScheduller {
 
     /**
      * cron = "[초] [분] [시] [일] [월] [요일]"
+     * 상시 구동 후 정해진 시간에 동작하는게 아닌 docker kubernetes cronjob 으로 동작하도록 수정. 26.01.19
      */
     @Scheduled(cron = "0 0 21 * * SAT,TUE")
     public void scheduleWeeklyFilingUpdate() {
