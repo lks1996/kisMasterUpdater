@@ -22,3 +22,8 @@ jobs:
       - name: 3. Prune Old Images
         continue-on-error: true
         run: docker image prune -f
+
+      # 4. API 서버 재시작.
+      - name: 4. Restart K8s Deployment
+        continue-on-error: true # 처음엔 배포가 안 되어 있을 수 있으니 에러 무시
+        run: kubectl rollout restart deployment/kis-master-updater-app
